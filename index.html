@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JasaKu - All-in-One Business Management</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary: #10b981; /* Emerald 500 */
+            --primary-dark: #059669; /* Emerald 600 */
+            --primary-light: #d1fae5;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --sidebar-width: 260px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            transition: background 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        /* --- Layout --- */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 2.5rem;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        [data-theme="dark"] .nav-item:hover, 
+        [data-theme="dark"] .nav-item.active {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--primary);
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            max-width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+        }
+
+        /* --- Cards & Dashboard --- */
+        .grid-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .stat-card h3 {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .chart-container {
+            height: 300px;
+            width: 100%;
+        }
+
+        /* --- Tables & Lists --- */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 12px 16px;
+            background: var(--bg-body);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-warning { background: #fef9c3; color: #854d0e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-info { background: #e0f2fe; color: #075985; }
+
+        /* --- Buttons --- */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-icon { padding: 8px; border-radius: 6px; }
+
+        /* --- Modals --- */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none; /* Changed via JS */
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-body);
+            color: var(--text-main);
+        }
+
+        /* --- Toast Notification --- */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border-left: 4px solid var(--primary);
+            padding: 12px 24px;
+            box-shadow: var(--shadow);
+            border-radius: 4px;
+            margin-top: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* --- Sections Visibility --- */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            .mobile-nav-toggle {
+                display: block !important;
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                color: var(--text-main);
+            }
+        }
+
+        .mobile-nav-toggle {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">
+                <i class="fas fa-gem"></i>
+                <span>JasaKu</span>
+            </div>
+            <nav class="nav-links">
+                <a class="nav-item active" onclick="navigate('dashboard')">
+                    <i class="fas fa-chart-pie"></i> Dashboard
+                </a>
+                <a class="nav-item" onclick="navigate('pelanggan')">
+                    <i class="fas fa-users"></i> Pelanggan
+                </a>
+                <a class="nav-item" onclick="navigate('order')">
+                    <i class="fas fa-shopping-cart"></i> Pesanan
+                </a>
+                <a class="nav-item" onclick="navigate('keuangan')">
+                    <i class="fas fa-wallet"></i> Keuangan
+                </a>
+                <a class="nav-item" onclick="navigate('tugas')">
+                    <i class="fas fa-check-double"></i> To-Do List
+                </a>
+                <a class="nav-item" onclick="navigate('marketing')">
+                    <i class="fas fa-bullhorn"></i> Marketing
+                </a>
+                <a class="nav-item" onclick="navigate('files')">
+                    <i class="fas fa-folder-open"></i> File Manager
+                </a>
+                <a class="nav-item" onclick="navigate('pengaturan')">
+                    <i class="fas fa-cog"></i> Pengaturan
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button class="mobile-nav-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="section-title">Dashboard</h1>
+                </div>
+                <div class="user-profile">
+                    <button class="theme-toggle" onclick="toggleTheme()">
+                        <i class="fas fa-moon" id="theme-icon"></i>
+                    </button>
+                    <div style="text-align: right">
+                        <p style="font-weight: 600; font-size: 0.9rem;" id="biz-name-display">Nama Usaha</p>
+                        <p style="font-size: 0.75rem; color: var(--text-muted)">Admin JasaKu</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active">
+                <div class="grid-stats">
+                    <div class="card stat-card">
+                        <h3>Pesanan Masuk</h3>
+                        <p id="stat-total-orders">0</p>
+                    </div>
+                    <div class="card stat-card">
+                        <h3>Total Pendapatan</h3>
+                        <p id="stat-revenue">Rp 0</p>
+                    </div>
+                    <div class="card stat-card">
+                        <h3>Pelanggan</h3>
+                        <p id="stat-customers">0</p>
+                    </div>
+                    <div class="card stat-card">
+                        <h3>Laba Bersih</h3>
+                        <p id="stat-profit">Rp 0</p>
+                    </div>
+                </div>
+
+                <div class="grid-stats" style="grid-template-columns: 2fr 1fr">
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem">Trend Keuangan</h3>
+                        <div class="chart-container">
+                            <canvas id="mainChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem">Jadwal Hari Ini</h3>
+                        <div id="today-schedule">
+                            <div class="empty-state" style="padding: 1rem">
+                                <p style="font-size: 0.8rem">Tidak ada jadwal hari ini.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pelanggan Section -->
+            <section id="pelanggan" class="section">
+                <div class="card">
+                    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem">
+                        <div style="position: relative; width: 300px">
+                            <i class="fas fa-search" style="position: absolute; left: 12px; top: 12px; color: var(--text-muted)"></i>
+                            <input type="text" class="form-control" placeholder="Cari pelanggan..." style="padding-left: 35px" onkeyup="searchCustomer(this.value)">
+                        </div>
+                        <button class="btn btn-primary" onclick="openModal('modal-customer')">
+                            <i class="fas fa-plus"></i> Tambah Pelanggan
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table id="table-customers">
+                            <thead>
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>WhatsApp</th>
+                                    <th>Alamat</th>
+                                    <th>Total Order</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- JS Injected -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Order Section -->
+            <section id="order" class="section">
+                <div class="card">
+                    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem">
+                        <div style="display:flex; gap: 10px">
+                            <select class="form-control" style="width: 150px" onchange="filterOrders(this.value)">
+                                <option value="Semua">Semua Status</option>
+                                <option value="Masuk">Masuk</option>
+                                <option value="Proses">Proses</option>
+                                <option value="Selesai">Selesai</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="openModal('modal-order')">
+                            <i class="fas fa-plus"></i> Buat Pesanan
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table id="table-orders">
+                            <thead>
+                                <tr>
+                                    <th>Pelanggan</th>
+                                    <th>Layanan</th>
+                                    <th>Deadline</th>
+                                    <th>Status</th>
+                                    <th>Total</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- JS Injected -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Keuangan Section -->
+            <section id="keuangan" class="section">
+                <div class="grid-stats">
+                    <div class="card">
+                        <h3 style="margin-bottom: 1.5rem">Tambah Transaksi</h3>
+                        <form id="form-finance" onsubmit="saveTransaction(event)">
+                            <div class="form-group">
+                                <label>Tipe</label>
+                                <select class="form-control" id="fin-type" required>
+                                    <option value="Pemasukan">Pemasukan (+)</option>
+                                    <option value="Pengeluaran">Pengeluaran (-)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Keterangan</label>
+                                <input type="text" class="form-control" id="fin-desc" placeholder="Contoh: Pembayaran Order #1" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Jumlah (Rp)</label>
+                                <input type="number" class="form-control" id="fin-amount" placeholder="0" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%">Simpan Transaksi</button>
+                        </form>
+                    </div>
+                    <div class="card" style="grid-column: span 2">
+                        <h3>Riwayat Keuangan</h3>
+                        <div class="table-container">
+                            <table id="table-finance">
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Keterangan</th>
+                                        <th>Tipe</th>
+                                        <th>Jumlah</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- JS Injected -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Marketing Tools Section -->
+            <section id="marketing" class="section">
+                <div class="grid-stats">
+                    <div class="card">
+                        <h3>Caption Generator</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem">Buat caption promosi otomatis untuk sosial media.</p>
+                        <div class="form-group">
+                            <label>Nama Layanan</label>
+                            <input type="text" id="mkt-service" class="form-control" placeholder="Contoh: Cuci Sepatu">
+                        </div>
+                        <div class="form-group">
+                            <label>Promo Utama</label>
+                            <input type="text" id="mkt-promo" class="form-control" placeholder="Contoh: Diskon 20% khusus hari ini">
+                        </div>
+                        <button class="btn btn-primary" onclick="generateCaption()">Generate Caption</button>
+                        <div id="caption-result" style="margin-top: 1.5rem; white-space: pre-line; padding: 1rem; background: var(--bg-body); border-radius: 8px; font-size: 0.9rem; display: none">
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Template Pricelist</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem">Preview daftar harga usaha Anda.</p>
+                        <div id="pricelist-container">
+                            <!-- JS Injected -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- To-Do List Section -->
+            <section id="tugas" class="section">
+                <div class="card" style="max-width: 600px; margin: 0 auto">
+                    <h3>Tim To-Do List</h3>
+                    <div style="display:flex; gap: 10px; margin: 1.5rem 0">
+                        <input type="text" id="todo-input" class="form-control" placeholder="Tambah tugas baru...">
+                        <button class="btn btn-primary" onclick="addTodo()"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div id="todo-list">
+                        <!-- JS Injected -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- File Manager Section -->
+            <section id="files" class="section">
+                <div class="card">
+                    <div style="border: 2px dashed var(--border); padding: 3rem; text-align: center; border-radius: var(--radius)">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem"></i>
+                        <p>Klik atau drop file di sini untuk upload (Local Preview)</p>
+                        <input type="file" id="file-input" style="display: none" onchange="handleFileUpload(event)">
+                        <button class="btn btn-outline" style="margin-top: 1rem" onclick="document.getElementById('file-input').click()">Pilih File</button>
+                    </div>
+                    <div id="file-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; margin-top: 2rem">
+                        <!-- JS Injected -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pengaturan Section -->
+            <section id="pengaturan" class="section">
+                <div class="card" style="max-width: 500px">
+                    <h3>Profil Bisnis</h3>
+                    <div class="form-group" style="margin-top: 1.5rem">
+                        <label>Nama Usaha</label>
+                        <input type="text" id="setting-biz-name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Nomor WhatsApp Bisnis</label>
+                        <input type="text" id="setting-biz-wa" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Warna Tema Utama</label>
+                        <input type="color" id="setting-theme-color" class="form-control" style="height: 50px">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSettings()">Simpan Perubahan</button>
+                    <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border)">
+                    <button class="btn btn-outline" style="color: #ef4444; border-color: #ef4444" onclick="clearAllData()">
+                        <i class="fas fa-trash"></i> Reset Semua Data
+                    </button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-customer" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 1.5rem">Tambah Pelanggan</h2>
+            <form onsubmit="saveCustomer(event)">
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="cust-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>No. WhatsApp</label>
+                    <input type="tel" id="cust-wa" class="form-control" placeholder="628xxx" required>
+                </div>
+                <div class="form-group">
+                    <label>Alamat</label>
+                    <textarea id="cust-address" class="form-control" rows="3"></textarea>
+                </div>
+                <div style="display:flex; justify-content: flex-end; gap: 10px">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-order" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 1.5rem">Buat Pesanan Baru</h2>
+            <form onsubmit="saveOrder(event)">
+                <div class="form-group">
+                    <label>Pilih Pelanggan</label>
+                    <select id="order-cust-id" class="form-control" required>
+                        <!-- JS Injected -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Layanan / Jasa</label>
+                    <input type="text" id="order-service" class="form-control" placeholder="Contoh: Pembuatan Website" required>
+                </div>
+                <div class="form-group">
+                    <label>Harga (Rp)</label>
+                    <input type="number" id="order-price" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Deadline</label>
+                    <input type="date" id="order-deadline" class="form-control" required>
+                </div>
+                <div style="display:flex; justify-content: flex-end; gap: 10px">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">Batal</button>
+                    <button type="submit" class="btn btn-primary">Buat Pesanan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Scripts -->
+    <script>
+        // --- Data State ---
+        let appData = {
+            customers: JSON.parse(localStorage.getItem('jasaku_customers')) || [],
+            orders: JSON.parse(localStorage.getItem('jasaku_orders')) || [],
+            finance: JSON.parse(localStorage.getItem('jasaku_finance')) || [],
+            todos: JSON.parse(localStorage.getItem('jasaku_todos')) || [],
+            files: JSON.parse(localStorage.getItem('jasaku_files')) || [],
+            settings: JSON.parse(localStorage.getItem('jasaku_settings')) || {
+                name: "Bisnis Saya",
+                wa: "628123456789",
+                theme: "#10b981",
+                darkMode: false
+            }
+        };
+
+        let chart = null;
+
+        // --- Core Functions ---
+        function init() {
+            renderDashboard();
+            updateStats();
+            applyTheme();
+            renderPricelist();
+            document.getElementById('setting-biz-name').value = appData.settings.name;
+            document.getElementById('setting-biz-wa').value = appData.settings.wa;
+            document.getElementById('setting-theme-color').value = appData.settings.theme;
+            document.getElementById('biz-name-display').innerText = appData.settings.name;
+        }
+
+        function saveData() {
+            localStorage.setItem('jasaku_customers', JSON.stringify(appData.customers));
+            localStorage.setItem('jasaku_orders', JSON.stringify(appData.orders));
+            localStorage.setItem('jasaku_finance', JSON.stringify(appData.finance));
+            localStorage.setItem('jasaku_todos', JSON.stringify(appData.todos));
+            localStorage.setItem('jasaku_files', JSON.stringify(appData.files));
+            localStorage.setItem('jasaku_settings', JSON.stringify(appData.settings));
+            updateStats();
+        }
+
+        function navigate(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            const titles = {
+                dashboard: "Dashboard",
+                pelanggan: "Manajemen Pelanggan",
+                order: "Manajemen Pesanan",
+                keuangan: "Laporan Keuangan",
+                tugas: "Daftar Tugas Tim",
+                marketing: "Marketing Tools",
+                files: "File Manager",
+                pengaturan: "Pengaturan"
+            };
+            document.getElementById('section-title').innerText = titles[sectionId];
+
+            if (sectionId === 'pelanggan') renderCustomers();
+            if (sectionId === 'order') renderOrders();
+            if (sectionId === 'keuangan') renderFinance();
+            if (sectionId === 'tugas') renderTodos();
+            if (sectionId === 'files') renderFiles();
+            
+            // Close mobile sidebar
+            document.getElementById('sidebar').classList.remove('mobile-open');
+        }
+
+        // --- Dashboard & Charts ---
+        function renderDashboard() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            
+            if (chart) chart.destroy();
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                    datasets: [{
+                        label: 'Pendapatan',
+                        data: [12, 19, 15, 25, 22, 30],
+                        borderColor: '#10b981',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function updateStats() {
+            const totalOrders = appData.orders.length;
+            const totalCustomers = appData.customers.length;
+            const revenue = appData.finance
+                .filter(f => f.type === 'Pemasukan')
+                .reduce((acc, curr) => acc + parseInt(curr.amount), 0);
+            const expense = appData.finance
+                .filter(f => f.type === 'Pengeluaran')
+                .reduce((acc, curr) => acc + parseInt(curr.amount), 0);
+
+            document.getElementById('stat-total-orders').innerText = totalOrders;
+            document.getElementById('stat-revenue').innerText = `Rp ${revenue.toLocaleString()}`;
+            document.getElementById('stat-customers').innerText = totalCustomers;
+            document.getElementById('stat-profit').innerText = `Rp ${(revenue - expense).toLocaleString()}`;
+        }
+
+        // --- Customer Logic ---
+        function renderCustomers(data = appData.customers) {
+            const tbody = document.querySelector('#table-customers tbody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fas fa-users"></i><p>Belum ada pelanggan.</p></td></tr>`;
+                return;
+            }
+
+            data.forEach((c, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${c.name}</strong></td>
+                    <td><a href="https://wa.me/${c.wa}" target="_blank" style="color: #25d366"><i class="fab fa-whatsapp"></i> ${c.wa}</a></td>
+                    <td>${c.address || '-'}</td>
+                    <td>${appData.orders.filter(o => o.custId == c.id).length} Order</td>
+                    <td>
+                        <button class="btn btn-outline btn-icon" onclick="deleteCustomer(${c.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function saveCustomer(e) {
+            e.preventDefault();
+            const newCust = {
+                id: Date.now(),
+                name: document.getElementById('cust-name').value,
+                wa: document.getElementById('cust-wa').value,
+                address: document.getElementById('cust-address').value
+            };
+            appData.customers.push(newCust);
+            saveData();
+            renderCustomers();
+            closeModal();
+            showToast('Pelanggan berhasil ditambahkan!');
+        }
+
+        function deleteCustomer(id) {
+            if(confirm('Hapus pelanggan ini?')) {
+                appData.customers = appData.customers.filter(c => c.id !== id);
+                saveData();
+                renderCustomers();
+            }
+        }
+
+        function searchCustomer(val) {
+            const filtered = appData.customers.filter(c => c.name.toLowerCase().includes(val.toLowerCase()));
+            renderCustomers(filtered);
+        }
+
+        // --- Order Logic ---
+        function renderOrders(data = appData.orders) {
+            const tbody = document.querySelector('#table-orders tbody');
+            tbody.innerHTML = '';
+
+            const custSelect = document.getElementById('order-cust-id');
+            custSelect.innerHTML = '<option value="">Pilih Pelanggan</option>';
+            appData.customers.forEach(c => {
+                custSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+            });
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-shopping-cart"></i><p>Belum ada pesanan.</p></td></tr>`;
+                return;
+            }
+
+            data.forEach(o => {
+                const customer = appData.customers.find(c => c.id == o.custId);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${customer ? customer.name : 'Unknown'}</td>
+                    <td>${o.service}</td>
+                    <td>${o.deadline}</td>
+                    <td><span class="badge ${getStatusBadge(o.status)}">${o.status}</span></td>
+                    <td>Rp ${parseInt(o.price).toLocaleString()}</td>
+                    <td>
+                        <div style="display:flex; gap: 5px">
+                            <button class="btn btn-outline btn-icon" onclick="updateOrderStatus(${o.id})"><i class="fas fa-sync"></i></button>
+                            <button class="btn btn-outline btn-icon" onclick="printInvoice(${o.id})"><i class="fas fa-file-invoice"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function saveOrder(e) {
+            e.preventDefault();
+            const newOrder = {
+                id: Date.now(),
+                custId: document.getElementById('order-cust-id').value,
+                service: document.getElementById('order-service').value,
+                price: document.getElementById('order-price').value,
+                deadline: document.getElementById('order-deadline').value,
+                status: 'Masuk'
+            };
+            appData.orders.push(newOrder);
+            
+            // Auto add to finance
+            appData.finance.push({
+                id: Date.now() + 1,
+                date: new Date().toLocaleDateString(),
+                desc: `Order: ${newOrder.service}`,
+                type: 'Pemasukan',
+                amount: newOrder.price
+            });
+
+            saveData();
+            renderOrders();
+            closeModal();
+            showToast('Order berhasil dibuat!');
+        }
+
+        function updateOrderStatus(id) {
+            const order = appData.orders.find(o => o.id === id);
+            const statuses = ['Masuk', 'Proses', 'Selesai'];
+            let nextIdx = statuses.indexOf(order.status) + 1;
+            if(nextIdx >= statuses.length) nextIdx = 0;
+            order.status = statuses[nextIdx];
+            saveData();
+            renderOrders();
+        }
+
+        function getStatusBadge(status) {
+            if (status === 'Selesai') return 'badge-success';
+            if (status === 'Proses') return 'badge-warning';
+            return 'badge-info';
+        }
+
+        // --- Finance Logic ---
+        function renderFinance() {
+            const tbody = document.querySelector('#table-finance tbody');
+            tbody.innerHTML = '';
+            appData.finance.sort((a,b) => b.id - a.id).forEach(f => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${f.date}</td>
+                    <td>${f.desc}</td>
+                    <td><span class="badge ${f.type === 'Pemasukan' ? 'badge-success' : 'badge-danger'}">${f.type}</span></td>
+                    <td>Rp ${parseInt(f.amount).toLocaleString()}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function saveTransaction(e) {
+            e.preventDefault();
+            const trans = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString(),
+                type: document.getElementById('fin-type').value,
+                desc: document.getElementById('fin-desc').value,
+                amount: document.getElementById('fin-amount').value
+            };
+            appData.finance.push(trans);
+            saveData();
+            renderFinance();
+            e.target.reset();
+            showToast('Transaksi disimpan!');
+        }
+
+        // --- Todo Logic ---
+        function renderTodos() {
+            const list = document.getElementById('todo-list');
+            list.innerHTML = '';
+            appData.todos.forEach((t, idx) => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style = 'display:flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; padding: 12px';
+                div.innerHTML = `
+                    <div style="display:flex; gap: 10px; align-items: center">
+                        <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTodo(${idx})">
+                        <span style="${t.done ? 'text-decoration: line-through; opacity: 0.5' : ''}">${t.text}</span>
+                    </div>
+                    <button class="btn btn-icon" style="color: #ef4444" onclick="deleteTodo(${idx})"><i class="fas fa-times"></i></button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function addTodo() {
+            const input = document.getElementById('todo-input');
+            if(!input.value) return;
+            appData.todos.push({ text: input.value, done: false });
+            input.value = '';
+            saveData();
+            renderTodos();
+        }
+
+        function toggleTodo(idx) {
+            appData.todos[idx].done = !appData.todos[idx].done;
+            saveData();
+            renderTodos();
+        }
+
+        function deleteTodo(idx) {
+            appData.todos.splice(idx, 1);
+            saveData();
+            renderTodos();
+        }
+
+        // --- Marketing Logic ---
+        function generateCaption() {
+            const service = document.getElementById('mkt-service').value;
+            const promo = document.getElementById('mkt-promo').value;
+            const result = document.getElementById('caption-result');
+
+            if(!service) return showToast('Masukkan nama layanan!');
+
+            const text = `✨ SOLUSI TERBAIK UNTUK ANDA ✨\n\nLagi butuh jasa ${service}? Serahkan pada ahlinya di ${appData.settings.name}! 🚀\n\n🔥 PROMO MINGGU INI: ${promo || 'Hubungi kami untuk penawaran menarik!'}\n\nKenapa pilih kami?\n✅ Pengerjaan Cepat\n✅ Hasil Berkualitas\n✅ Harga Bersahabat\n\nKlik link di bio atau Hubungi WA: ${appData.settings.wa}\n\n#${service.replace(/\s/g, '')} #UMKMIndonesia #JasaTerpercaya`;
+            
+            result.innerText = text;
+            result.style.display = 'block';
+            
+            // Auto copy feature
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            showToast('Caption digenerate & dicopy!');
+        }
+
+        function renderPricelist() {
+            const container = document.getElementById('pricelist-container');
+            const services = [...new Set(appData.orders.map(o => o.service))].slice(0, 5);
+            
+            if(services.length === 0) {
+                container.innerHTML = '<p class="empty-state">Data harga akan muncul setelah ada pesanan.</p>';
+                return;
+            }
+
+            let html = '<div style="background: var(--primary); color: white; padding: 1.5rem; border-radius: 8px">';
+            html += `<h4 style="text-align: center; margin-bottom: 1rem">${appData.settings.name} Pricelist</h4>`;
+            services.forEach(s => {
+                const avgPrice = appData.orders.find(o => o.service === s).price;
+                html += `<div style="display:flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding: 8px 0">
+                            <span>${s}</span>
+                            <span>Rp ${parseInt(avgPrice).toLocaleString()}</span>
+                         </div>`;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // --- File Manager ---
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                appData.files.push({
+                    name: file.name,
+                    data: event.target.result,
+                    type: file.type
+                });
+                saveData();
+                renderFiles();
+                showToast('File berhasil diupload!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function renderFiles() {
+            const gallery = document.getElementById('file-gallery');
+            gallery.innerHTML = '';
+            appData.files.forEach((f, idx) => {
+                const item = document.createElement('div');
+                item.className = 'card';
+                item.style = 'padding: 10px; text-align: center; position: relative';
+                
+                let preview = '<i class="fas fa-file" style="font-size: 2rem"></i>';
+                if(f.type.includes('image')) {
+                    preview = `<img src="${f.data}" style="width: 100%; height: 80px; object-fit: cover; border-radius: 4px">`;
+                }
+
+                item.innerHTML = `
+                    ${preview}
+                    <p style="font-size: 0.7rem; margin-top: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">${f.name}</p>
+                    <button onclick="deleteFile(${idx})" style="position: absolute; top: 2px; right: 2px; border: none; background: #ef4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.6rem; cursor: pointer">×</button>
+                `;
+                gallery.appendChild(item);
+            });
+        }
+
+        function deleteFile(idx) {
+            appData.files.splice(idx, 1);
+            saveData();
+            renderFiles();
+        }
+
+        // --- UI Helpers ---
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        }
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = msg;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function toggleTheme() {
+            appData.settings.darkMode = !appData.settings.darkMode;
+            saveData();
+            applyTheme();
+        }
+
+        function applyTheme() {
+            if(appData.settings.darkMode) {
+                document.body.setAttribute('data-theme', 'dark');
+                document.getElementById('theme-icon').className = 'fas fa-sun';
+            } else {
+                document.body.removeAttribute('data-theme');
+                document.getElementById('theme-icon').className = 'fas fa-moon';
+            }
+            // Apply custom primary color if changed
+            document.documentElement.style.setProperty('--primary', appData.settings.theme);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+        }
+
+        function saveSettings() {
+            appData.settings.name = document.getElementById('setting-biz-name').value;
+            appData.settings.wa = document.getElementById('setting-biz-wa').value;
+            appData.settings.theme = document.getElementById('setting-theme-color').value;
+            saveData();
+            init();
+            showToast('Pengaturan disimpan!');
+        }
+
+        function printInvoice(orderId) {
+            const order = appData.orders.find(o => o.id === orderId);
+            const customer = appData.customers.find(c => c.id == order.custId);
+            const printWin = window.open('', '', 'width=600,height=600');
+            printWin.document.write(`
+                <html>
+                <body style="font-family: sans-serif; padding: 40px">
+                    <h2 style="color: #10b981">${appData.settings.name}</h2>
+                    <hr>
+                    <p><strong>Invoice No:</strong> #INV-${order.id}</p>
+                    <p><strong>Kepada:</strong> ${customer ? customer.name : '-'}</p>
+                    <p><strong>Layanan:</strong> ${order.service}</p>
+                    <p><strong>Tanggal:</strong> ${new Date().toLocaleDateString()}</p>
+                    <hr>
+                    <h3 style="text-align: right">Total: Rp ${parseInt(order.price).toLocaleString()}</h3>
+                    <p style="margin-top: 50px; text-align: center; font-style: italic">Terima kasih telah menggunakan jasa kami!</p>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
+            printWin.print();
+        }
+
+        function clearAllData() {
+            if(confirm('PERINGATAN: Semua data akan dihapus permanen. Lanjutkan?')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // Initialize App
+        window.onload = init;
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') closeModal();
+        }
+    </script>
+</body>
+</html>
+
